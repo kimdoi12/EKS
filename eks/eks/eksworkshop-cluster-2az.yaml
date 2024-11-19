@@ -1,0 +1,136 @@
+# A simple example of ClusterConfig object:
+---
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: eksworkshop
+  region: ap-northeast-2
+  version: "1.30"
+
+vpc: 
+  id: vpc-0439a1e9722c4ff54
+  subnets:
+    public:
+#      ap-northeast-2a: { id: subnet-0dabdc92b066581ad}
+#      ap-northeast-2c: { id: subnet-01b9091263c4b30fa}
+      PublicSubnet01:
+        id: subnet-0245308f6fc8d8fe6
+      PublicSubnet03:
+        id: subnet-024fd483940f8af52
+    private:
+#      ap-northeast-2a: { id: subnet-0262f5b422602c335}
+#      ap-northeast-2c: { id: subnet-0f1eedd72ed2aa9be}
+      PrivateSubnet01:
+        id: subnet-0eba20260f6e14c61
+      PrivateSubnet03:
+        id: subnet-072342b319f20ec62
+
+nodeGroups:
+  - name: ng-public-01
+    instanceType: m5.xlarge
+    subnets:
+      - PublicSubnet01
+      - PublicSubnet03
+    desiredCapacity: 2
+    minSize: 2
+    maxSize: 4
+    volumeSize: 10
+    volumeType: gp3 
+    amiFamily: AmazonLinux2
+    labels:
+      nodegroup-type: "frontend-workloads"
+    ssh: 
+        publicKeyPath: "/home/ec2-user/environment/eksworkshop.pub"
+        allow: true
+    iam:
+      attachPolicyARNs:
+      withAddonPolicies:
+        autoScaler: true
+        cloudWatch: true
+        ebs: true
+        fsx: true
+        efs: true
+
+  - name: ng-private-01
+    instanceType: t3.medium
+    subnets:
+      - PrivateSubnet01
+      - PrivateSubnet03
+    desiredCapacity: 2
+    privateNetworking: true
+    minSize: 2
+    maxSize: 4
+    volumeSize: 10
+    volumeType: gp3 
+    amiFamily: AmazonLinux2
+    labels:
+      nodegroup-type: "backend-workloads"
+    ssh: 
+        publicKeyPath: "/home/ec2-user/environment/eksworkshop.pub"
+        allow: true
+    iam:
+      attachPolicyARNs:
+      withAddonPolicies:
+        autoScaler: true
+        cloudWatch: true
+        ebs: true
+        fsx: true
+        efs: true
+
+managedNodeGroups:
+  - name: managed-ng-public-01
+    instanceType: t3.medium
+    subnets:
+      - PublicSubnet01
+      - PublicSubnet03
+    desiredCapacity: 2
+    minSize: 2
+    maxSize: 4
+    volumeSize: 10
+    volumeType: gp3 
+    amiFamily: AmazonLinux2
+    labels:
+      nodegroup-type: "managed-frontend-workloads"
+    ssh: 
+        publicKeyPath: "/home/ec2-user/environment/eksworkshop.pub"
+        allow: true
+    iam:
+      attachPolicyARNs:
+      withAddonPolicies:
+        autoScaler: true
+        cloudWatch: true
+        ebs: true
+        fsx: true
+        efs: true
+        
+  - name: managed-ng-private-01
+    instanceType: t3.medium
+    subnets:
+      - PrivateSubnet01
+      - PrivateSubnet03
+    desiredCapacity: 2
+    privateNetworking: true
+    minSize: 2
+    maxSize: 4
+    volumeSize: 10
+    volumeType: gp3 
+    amiFamily: AmazonLinux2
+    labels:
+      nodegroup-type: "managed-backend-workloads"
+    ssh: 
+        publicKeyPath: "/home/ec2-user/environment/eksworkshop.pub"
+        allow: true
+    iam:
+      attachPolicyARNs:
+      withAddonPolicies:
+        autoScaler: true
+        cloudWatch: true
+        ebs: true
+        fsx: true
+        efs: true
+        
+cloudWatch:
+    clusterLogging:
+        enableTypes: ["api", "audit", "authenticator", "controllerManager", "scheduler"]
+

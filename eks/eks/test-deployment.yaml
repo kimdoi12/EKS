@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: alpine-app
+  labels:
+    app: alpine-app
+#name space change 
+#  namespace: network-test
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: alpine-app
+  template:
+    metadata:
+      labels:
+        app: alpine-app
+    spec:
+      containers:
+      - image: praqma/network-multitool
+        imagePullPolicy: Always
+        name: alpine-app
+        ports:
+        - containerPort: 80
+          protocol: TCP
+#add nodeSelector
+      nodeSelector:
+        nodegroup-type: "frontend-workloads"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: alpine-app
+spec:
+  selector:
+    app: alpine-app
+#  type: LoadBalancer
+  type: NodePort
+  ports:
+   -  protocol: TCP
+      nodePort: 30080
+      port: 8080
+      targetPort: 80
